@@ -641,5 +641,12 @@
       "$0"
     ],
     "description": "最大クリーク（bit 全探索＋隣接行列で全ペア検査）O(2^N * N^2)。N≤15。連結成分(uf)とは別物"
+  },
+  "Output answer": {
+    "prefix": "cout",
+    "body": [
+      "cout << ${1:ans} << '\\n';"
+    ],
+    "description": "答えを1行出力（endl より速い '\\n' 改行）"
   }
 }
