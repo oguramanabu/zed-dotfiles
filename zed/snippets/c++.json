@@ -648,5 +648,45 @@
       "cout << ${1:ans} << '\\n';"
     ],
     "description": "答えを1行出力（endl より速い '\\n' 改行）"
+  },
+  "Half Enumeration (meet in the middle)": {
+    "prefix": "half",
+    "body": [
+      "// ====== 半分列挙（meet in the middle） ======",
+      "// 「K 個選んで合計 ≤ M の最大値」のような問題を、K/2 個ずつの列挙 2 回に分割する典型。",
+      "// 例: ダーツ 4 本以下 → 「2 本以下の合計」を列挙し、2 本以下 + 2 本以下 で 4 本以下を表す。",
+      "// 全探索 O(N^K) → 列挙 O(N^(K/2)) + sort + 二分探索 O(N^(K/2) log N)。N=1000, K=4 なら約 5e5 要素で間に合う。",
+      "//",
+      "// 【ポイント】",
+      "//   ・0 個（スコア 0）を必ず入れる。入れないと 1 個・3 個だけ選ぶケースが拾えない。",
+      "//   ・合計は順序に依らないので j = i から始めて {a,b} と {b,a} の重複を省く（サイズ約半分）。",
+      "//     j = i+1 ではなく j = i なのは「同じものを 2 回選ぶ」ケースを含めるため。",
+      "//   ・重複が残っていても二分探索の答えは変わらないので、set にせず vector + sort が速い。",
+      "//     完全に消したいなら sort 後に erase(unique(...)) を使う。",
+      "//   ・upper_bound(M - x) で「M - x 以下の最大要素」を取り、相手側 x と足して最大化する。",
+      "",
+      "int n = ${1:N};",
+      "ll m = ${2:M};  // 合計の上限",
+      "vector<ll> half;  // 0〜2 個選んだときの合計を全部入れる",
+      "half.push_back(0);  // 0 個",
+      "for (int i = 0; i < n; i++) {",
+      "  half.push_back(${3:P}[i]);  // 1 個",
+      "  for (int j = i; j < n; j++) {  // j = i: 同じものを 2 回選ぶのも許す",
+      "    half.push_back($3[i] + $3[j]);  // 2 個",
+      "  }",
+      "}",
+      "sort(half.begin(), half.end());",
+      "",
+      "ll ans = 0;",
+      "for (ll x : half) {  // 前半の合計 x を決めて、後半を二分探索",
+      "  if (x > m) break;  // sort 済みなので以降も全部超える",
+      "  // m - x 以下で最大の要素: upper_bound の 1 つ前。half[0] = 0 なので必ず存在する",
+      "  auto it = upper_bound(half.begin(), half.end(), m - x);",
+      "  --it;",
+      "  ans = max(ans, x + *it);",
+      "}",
+      "$0"
+    ],
+    "description": "半分列挙（meet in the middle）O(N^2 log N)。K 個選ぶ最適化を K/2 個ずつの列挙+sort+二分探索に分割する典型（ダーツ 4 本など）"
   }
 }
