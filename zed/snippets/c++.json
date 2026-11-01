@@ -688,5 +688,30 @@
       "$0"
     ],
     "description": "半分列挙（meet in the middle）O(N^2 log N)。K 個選ぶ最適化を K/2 個ずつの列挙+sort+二分探索に分割する典型（ダーツ 4 本など）"
+  },
+  "DFS with timestamps (pre/post order)": {
+    "prefix": "dfst",
+    "body": [
+      "// DFS（行きがけ時刻 d・帰りがけ時刻 f 付き）O(V+E)",
+      "// 有向グラフOK。未訪問の頂点から再開するので、非連結でも全頂点を回る",
+      "// 使い道: ALDS1_11_B、部分木判定（d[u] < d[v] && f[v] < f[u] なら v は u の子孫）、f の降順＝トポロジカル順",
+      "// 小さい番号から訪問したいときは、各 graph[v] を sort しておく",
+      "// 既存の dfs（visited だけの版）と違い、時刻を記録し、全頂点から再開する",
+      "vector<int> d(${1:N}, 0), f($1, 0); // 0 なら未訪問",
+      "int timer = 0;",
+      "auto dfs = [&](auto self, int v) -> void {",
+      "  d[v] = ++timer;               // 行きがけ（訪れた時刻）",
+      "  for (int to : graph[v]) {",
+      "    if (d[to] != 0) continue;   // 訪問済みは飛ばす",
+      "    self(self, to);             // 終わると、ここ（呼び出し元のループの続き）に戻る",
+      "  }",
+      "  f[v] = ++timer;               // 帰りがけ（調べ終わった時刻）",
+      "};",
+      "for (int v = 0; v < $1; v++) {",
+      "  if (d[v] == 0) dfs(dfs, v);   // 未訪問の頂点から再開",
+      "}",
+      "$0"
+    ],
+    "description": "DFS（行きがけ d・帰りがけ f のタイムスタンプ付き・全頂点から再開）O(V+E)。部分木判定・トポロジカル順にも"
   }
 }
