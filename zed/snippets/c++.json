@@ -110,7 +110,7 @@
     "prefix": "dir4",
     "body": [
       "const int dy[4] = {-1, 0, 1, 0}; // 上右下左",
-      "const int dx[4] = {0, -1, 0, 1}; // 上右下左"
+      "const int dx[4] = {0, -1, 0, 1}; // 上左下右"
     ],
     "description": "4方向（上左下右）"
   },
@@ -713,5 +713,36 @@
       "$0"
     ],
     "description": "DFS（行きがけ d・帰りがけ f のタイムスタンプ付き・全頂点から再開）O(V+E)。部分木判定・トポロジカル順にも"
+  },
+  "Grid Backtracking (longest path)": {
+    "prefix": "backtrack",
+    "body": [
+      "// バックトラック（グリッドの一筆書き・全経路探索）",
+      "// 「同じマスでも来た道で値が変わる」→ 配列ではなく引数（depth）で運ぶ",
+      "// 足跡は自分で付けて自分で消す：true と false は同じ [y][x] のペア（[ny][nx] ではない）",
+      "// 計算量: 経路数に比例（指数的になり得る）→ 制約で経路数の上限を必ず確認",
+      "// 例: JOI2009予選D 薄氷渡り（最長経路）。既存の dfs/dfst は足跡を残す版（到達判定・連結成分）",
+      "vector<vector<bool>> visited(${1:H}, vector<bool>(${2:W}, false));",
+      "int ans = 0;",
+      "const int dy[4] = {-1, 0, 1, 0};",
+      "const int dx[4] = {0, 1, 0, -1}; // 上右下左",
+      "auto dfs = [&](auto self, int y, int x, int depth) -> void {",
+      "  visited[y][x] = true;              // ┐ 行きがけ：自分の足跡を付ける",
+      "  ans = max(ans, depth);",
+      "  for (int k = 0; k < 4; k++) {",
+      "    int ny = y + dy[k], nx = x + dx[k];",
+      "    if (ny < 0 || ny >= $1 || nx < 0 || nx >= $2) continue; // 範囲外（必ず最初）",
+      "    if (${3:g}[ny][nx] == 0) continue;                          // 通れない",
+      "    if (visited[ny][nx]) continue;                             // 今歩いている道の上",
+      "    self(self, ny, nx, depth + 1);     // 戻ると for の続き（次の方向）から再開",
+      "  }",
+      "  visited[y][x] = false;             // ┘ 帰りがけ：自分の足跡を自分で消す",
+      "};",
+      "for (int y = 0; y < $1; y++)",
+      "  for (int x = 0; x < $2; x++)",
+      "    if ($3[y][x] == 1) dfs(dfs, y, x, 1); // 全てのマスをスタートに",
+      "$0"
+    ],
+    "description": "グリッドのバックトラック（一筆書きの最長経路・全経路探索）。行きがけで visited=true、帰りがけで false。経路数に比例"
   }
 }
